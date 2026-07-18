@@ -22,6 +22,11 @@
         <!-- for source and reporting encoding files-->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <!-- adding version properties for TestNG, Cucumber, and Maven Surefire -->
+        <cucumber.version>7.20.1</cucumber.version>
+        <testng.version>7.10.2</testng.version>
+        <maven.surefire.version>3.5.2</maven.surefire.version>
     </properties>
 
     <build>
