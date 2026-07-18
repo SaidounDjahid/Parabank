@@ -29,8 +29,38 @@
         <maven.surefire.version>3.5.2</maven.surefire.version>
     </properties>
 
+    <!--Dependencies: Cucumber, TestNG-->
+    <dependencies>
+
+    <dependency>
+        <!--cucumber for java-->
+        <groupId>io.cucumber</groupId>
+        <artifactId>cucumber-java</artifactId>
+        <version>${cucumber.version}</version>
+        <scope>test</scope>
+    </dependency>
+
+    <dependency>
+        <!--cucumber for testNG-->
+        <groupId>io.cucumber</groupId>
+        <artifactId>cucumber-testng</artifactId>
+        <version>${cucumber.version}</version>
+        <scope>test</scope>
+    </dependency>
+
+    <dependency>
+        <!--TestNG-->
+        <groupId>org.testng</groupId>
+        <artifactId>testng</artifactId>
+        <version>${testng.version}</version>
+        <scope>test</scope>
+    </dependency>
+
+</dependencies>
+
     <build>
         <plugins>
+            <!--compilation plugin-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <!-- maven compiler plugin responsible for compiling the source code, for example  turning a .java file into a .class file -->
@@ -43,6 +73,23 @@
                     <release>${maven.compiler.release}</release>
                 </configuration>
             </plugin>
+
+
+            <!-- surefire plugin-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${maven.surefire.version}</version>
+
+                    <configuration>
+                        <includes>
+                        <include>**/TestRunner.java</include>
+                        </includes>
+                    </configuration>
+            </plugin>
+            
+
+
         </plugins>
     </build>
 
