@@ -1,0 +1,27 @@
+<!-- to avoid pushing the compiled code to the repository, we ignore the target folder, we also ignore other things that we dont want to appear as commit or stage -->
+<!-- ignore the target folder where the compiled code is generated ie the java class files + local executions files / reports -->
+<!-- ignore the local reports generated after execution -->
+<!-- ignore the IDEs details -->
+<!-- ignore the Temp files -->
+# Maven
+target/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# Visual Studio Code
+.vscode/
+
+# Operating systems
+.DS_Store
+Thumbs.db
+
+# Local configuration
+.env
+config-local.properties

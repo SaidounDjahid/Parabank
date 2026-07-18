@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Principal Maven Project Balise: -->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <!-- maven model version -->
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--Project coordinates: groupId, artifactId, version, name -->
+    <groupId>com.parabank</groupId>
+
+    <artifactId>parabank-kata</artifactId>
+
+    <version>1.0-SNAPSHOT</version>
+
+    <name>ParaBank Test Automation Kata Exercise</name>
+
+    <properties>
+        <!-- Java compiler settings for maven-->
+        <maven.compiler.release>17</maven.compiler.release>
+        <!-- for source and reporting encoding files-->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <!-- maven compiler plugin responsible for compiling the source code, for example  turning a .java file into a .class file -->
+                <artifactId>maven-compiler-plugin</artifactId>
+                <!-- maven compiler plugin version -->
+                <version>3.13.0</version>
+                
+                <configuration>
+                    <!-- Java compiler settings for maven: fecthing the release version from the properties ie 17 -->
+                    <release>${maven.compiler.release}</release>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
