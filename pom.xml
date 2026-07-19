@@ -66,6 +66,13 @@
     <version>${rest.assured.version}</version>
     <scope>test</scope>
 </dependency>
+    <!-- adding picocontainer-->
+    <dependency>
+    <groupId>io.cucumber</groupId>
+    <artifactId>cucumber-picocontainer</artifactId>
+    <version>${cucumber.version}</version>
+    <scope>test</scope>
+</dependency>
 
 </dependencies>
 
