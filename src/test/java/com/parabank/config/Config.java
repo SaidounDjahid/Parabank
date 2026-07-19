@@ -35,8 +35,8 @@ public final class Config {
     String fileValue = PROPERTIES.getProperty(key); 
         
     if (fileValue == null || fileValue.isBlank()){
-        throw new IllegalAccessException(
-            "missing configuration value:" + key);
+        throw new IllegalStateException(
+            "missing configuration value: " + key);
         
     }
     
