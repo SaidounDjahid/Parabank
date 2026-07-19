@@ -48,11 +48,9 @@ public final class Config {
     public static int getInt(String key){
     return Integer.parseInt(get(key));
     }
-
-
-    public static boolean getBoolean(String key){
-    return Boolean.parseBoolean(key);
-    }
+    public static boolean getBoolean(String key) {
+    return Boolean.parseBoolean(get(key));
+}
 
 
 }
