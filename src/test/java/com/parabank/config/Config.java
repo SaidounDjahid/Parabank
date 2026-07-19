@@ -35,7 +35,7 @@ public static String get(String key) {
         return systemValue.trim();
     }
 
-    String fileValue = properties.getProperty(key); 
+    String fileValue = PROPERTIES.getProperty(key); 
         
     if (fileValue == null || fileValue.isBlank()){
         throw new IllegalAccessException(
