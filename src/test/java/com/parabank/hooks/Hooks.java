@@ -12,7 +12,7 @@ public class Hooks {
 
     private final TestContext context;
     
-    Public Hooks (TestContext context) { //constructeur de la classe Hooks => crée un objet Hooks et lui assigne l'objet context instance de la classe TestContext
+    public Hooks(TestContext context) { //constructeur de la classe Hooks => crée un objet Hooks et lui assigne l'objet context instance de la classe TestContext
         this.context=context;
     }
 
