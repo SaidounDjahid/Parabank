@@ -13,7 +13,7 @@ import java.time.Duration;
 public class BasePage {
 
     protected final WebDriver driver;
-    protected final WevDriverWait wait;
+    protected final WebDriverWait wait;
 
     public BasePage(WebDriver driver){//constructeur de la classe BasePage => construits des objets de type BasePage
         this.driver = driver;
@@ -30,7 +30,7 @@ public class BasePage {
     protected void type (By Locator, String text){ //procedure to type in text inside element = Locator
             
         WebElement element = wait.until(
-        ExpectedConditions.visibilityOfElementLocated(locator));
+        ExpectedConditions.visibilityOfElementLocated(Locator));
 
         element.clear(); //vider l'élément 
         element.sendKeys(text); // envoyer le texte
