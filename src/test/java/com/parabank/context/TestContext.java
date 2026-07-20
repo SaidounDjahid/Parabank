@@ -24,8 +24,9 @@
 //
 package com.parabank.context;
 
-import io.restassured.response.Response;
 
+import io.restassured.response.Response;
+import org.openqa.selenium.WebDriver; //charge chromeDriver automatiquent => car contient Selenium Manager qui détecte chrome et gère automatiquement le chromeDriver lorsqu'un driver n'est fourni manuellemment (si nous voulons cross browser nous devons fournir les drivers pour chaque browser)
 
 
 //TestContext a des champs publics
@@ -36,5 +37,8 @@ public class TestContext {
     public int sourceAccountId;
 
 
+    public WebDriver driver; // +ieurs classes differentes auront besoin d'utiliser la meme navigateur
+    //Hooks => va créer chrome TestContext.driver => sera utilisé par Uisteps Page Objects
+    //cela répond ay meme principe que pour customerId et sourceAccountId
     
 }
