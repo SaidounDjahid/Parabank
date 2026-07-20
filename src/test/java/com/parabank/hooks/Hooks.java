@@ -35,16 +35,16 @@ public class Hooks {
         context.driver.manage().window().maximize(); //lance la fenetre
         }
     }
+    @After("@ui")
+    public void closeBrowser() {
 
-    @After("ui")
-    //Après chaque scénario UI, fermer Chrome.
+    System.out.println("AFTER HOOK: fermeture du navigateur");
 
-    public void closeBrowser(){
-        if (context.driver != null ) { //si driver contient quelque chose alors quitte le 
-            context.driver.quit();
-            context.driver = null;
-        }
+    if (context.driver != null) {
+        context.driver.quit();
+        context.driver = null;
     }
+}
 
 
 

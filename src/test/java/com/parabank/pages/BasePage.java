@@ -48,18 +48,45 @@ public class BasePage {
                 .trim(); //nettoie la chaine des espaces au début et des espaces a la   
     }
 
-    protected void selectByText(By locator, String text) { //this method select the option by the visible text to the user par example <select id="type">
-    //<option value="0">CHECKING</option>
-    //<option value="1">SAVINGS</option>
-    //</select> 
-    //selectByText(By.id("type"), "SAVINGS"); => selenium cherche l'option visible a l'utilisateur i.e Savings
+    // protected void selectByText(By locator, String text) { //this method select the option by the visible text to the user par example <select id="type">
+    // //<option value="0">CHECKING</option>
+    // //<option value="1">SAVINGS</option>
+    // //</select> 
+    // //selectByText(By.id("type"), "SAVINGS"); => selenium cherche l'option visible a l'utilisateur i.e Savings
 
-    //
+    // //
 
-        WebElement element = wait.until(
-                ExpectedConditions.elementToBeClickable(locator));
+    //     WebElement element = wait.until(
+    //             ExpectedConditions.elementToBeClickable(locator));
 
-        new Select(element).selectByVisibleText(text);
+    //     new Select(element).selectByVisibleText(text);
+    // }
+
+
+    protected void selectByText(By locator, String text) {
+
+    wait.until(driver -> {
+
+        WebElement selectElement =
+                driver.findElement(locator);
+
+        Select select =
+                new Select(selectElement);
+
+        return select.getOptions()
+                .stream()
+                .anyMatch(option ->
+                        option.getText()
+                                .trim()
+                                .equals(text));
+    });
+
+    WebElement selectElement =
+            driver.findElement(locator);
+
+    new Select(selectElement)
+            .selectByVisibleText(text);
+
     }
 
     protected void selectByValue(By locator, String value) {//cette méthode selectionne l'option selon la valeur technique contenu dans l'attribut technique html value

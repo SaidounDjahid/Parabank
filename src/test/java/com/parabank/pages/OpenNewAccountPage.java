@@ -39,13 +39,10 @@ public class OpenNewAccountPage extends BasePage { // la classe OpenNewAccount h
         selectByText( //choisi le type de compte (Savings/checking) et le passe a la methode SelextByText 
                 accountTypeSelect, //locator details + type de compte 
                 accountType);
+        selectByText(sourceAccountSelect,String.valueOf(sourceAccountId));
 
-        selectByValue( //choisi le id du compte de funding et le passe a la méthode SelextByValue on passe le locator sourceAccountSelect + le funding sourcé convertit en String
-                sourceAccountSelect, //choisis le sourceAccountId 
-                String.valueOf(sourceAccountId)); //String.valueOf(sourceAccountId) transforme : entier 13344 → texte "13344" car selectByValue recoit une chaine
 
-        click(openAccountButton); //clique sur le boutin opn account
-    }
+                    click(openAccountButton);}
 
     public boolean isConfirmationDisplayed() { //méthode qui vérifie si la confirmation de création du nouveau compte est affichée ou pas
 
