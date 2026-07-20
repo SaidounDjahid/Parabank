@@ -34,6 +34,9 @@
         <!-- ajout des rreconnaisnsae de tag
             <cucumber.filter.tags></cucumber.filter.tags> -->
 
+        <!--Selenium 4.X.X addition-->
+        <selenium.version>4.46.0</selenium.version>
+
     </properties>
 
     <!--Dependencies: Cucumber, TestNG-->
@@ -75,6 +78,13 @@
     <groupId>io.cucumber</groupId>
     <artifactId>cucumber-picocontainer</artifactId>
     <version>${cucumber.version}</version>
+    <scope>test</scope>
+</dependency>
+    <!--selenium dependency-->
+    <dependency>
+    <groupId>org.seleniumhq.selenium</groupId>
+    <artifactId>selenium-java</artifactId>
+    <version>${selenium.version}</version>
     <scope>test</scope>
 </dependency>
 
