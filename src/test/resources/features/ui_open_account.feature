@@ -2,9 +2,9 @@
 Feature: Open New Account from UI and Verify Account Overview
 
   Background:
-    Given an active Parabank customer is available through the API
-    And an exisiting customer account is selected through the API
-    And the customer is logged in to the web portal
+    Given an active Parabank customer is available through the API  #de ApiSteps
+    And an exisiting customer account is selected through the API #de ApiSteps
+    And the customer is logged in to the web portal #UiSteps
 
   @positive
   Scenario: Open a new savings account
