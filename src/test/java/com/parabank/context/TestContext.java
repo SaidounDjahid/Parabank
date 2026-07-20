@@ -35,10 +35,12 @@ public class TestContext {
     public Response response;
     public int customerId;
     public int sourceAccountId;
-
+    public int newAccountId;
 
     public WebDriver driver; // +ieurs classes differentes auront besoin d'utiliser la meme navigateur
     //Hooks => va créer chrome TestContext.driver => sera utilisé par Uisteps Page Objects
     //cela répond ay meme principe que pour customerId et sourceAccountId
+
+
     
 }

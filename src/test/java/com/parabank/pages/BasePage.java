@@ -10,13 +10,15 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 
+//the page that will host all the common actions needed on all the web pages of the parabank software
+
 public class BasePage {
 
-    protected final WebDriver driver;
-    protected final WebDriverWait wait;
+    protected final WebDriver driver; //driver c'est l'objet qui controle chrome : ouvre url, cherche element, cliquer, ecrire, fermer le navigateur
+    protected final WebDriverWait wait; // sert a attendre qu'un élement soit prêt
 
     public BasePage(WebDriver driver){//constructeur de la classe BasePage => construits des objets de type BasePage
-        this.driver = driver;
+        this.driver = driver; //une page recoit le navigateur driver deja ouvert puis construis son attente selenium
 
         this.wait = new WebDriverWait(driver, Duration.ofSeconds( //le contenu de la clé wait.seconds a partir du fichier config.properties
                         Config.getInt("wait.seconds")));
@@ -24,7 +26,9 @@ public class BasePage {
     }
 
     protected void click(By Locator){ // procedure to click on element = Locator
-        wait.until(ExpectedConditions.elementToBeClickable(Locator)).click();
+       
+       //attend jusqu'au ce que Locator soit cliquable puis continue immédiatlement
+        wait.until(ExpectedConditions.elementToBeClickable(Locator)).click(); //attends jusqu'a ce que l'élément soit pret plutot que de faire faire Thread.Sleep(3000); qui est une attente statique que ce soit lelement soit pret ou pas 
     }
 
     protected void type (By Locator, String text){ //procedure to type in text inside element = Locator
@@ -32,11 +36,11 @@ public class BasePage {
         WebElement element = wait.until(
         ExpectedConditions.visibilityOfElementLocated(Locator));
 
-        element.clear(); //vider l'élément 
-        element.sendKeys(text); // envoyer le texte
+        element.clear(); //vider l'élément ie efface son ancien contenu 
+        element.sendKeys(text); // envoyer le texte ie ecrit le nouveau texte text
     }
 
-    protected String getText(By locator) { //to read a test for a Locator
+    protected String getText(By locator) { //to read a test for a Locator, elle lit le texte lisible d'un élément
 
         return wait.until(
                 ExpectedConditions.visibilityOfElementLocated(locator))
@@ -58,7 +62,7 @@ public class BasePage {
         new Select(element).selectByVisibleText(text);
     }
 
-    protected void selectByValue(By locator, String value) {//cette méthode selectionne l'option selon la valeur technique contenu dans l'attribut html value
+    protected void selectByValue(By locator, String value) {//cette méthode selectionne l'option selon la valeur technique contenu dans l'attribut technique html value
     //<select id="type">
     //<option value="0">CHECKING</option>
     //<option value="1">SAVINGS</option>
@@ -79,5 +83,6 @@ public class BasePage {
                 .isDisplayed();
     }
 
+    //les procedures de la page BasePage seront utilisés par toutes les pages du site web (LoginPage,OpenNewAccountPage,AccountOverviewPage,BillPayPage), elle devront donc utiliser les méthodes de la classe BasePage, il faut alors que les méthodes soient en protected afin que les classes enfants puisse les utiliser, 
 
 }
