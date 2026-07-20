@@ -2,7 +2,7 @@ package com.parabank.steps;
 
 
 import com.parabank.config.Config;
-import io.cucumber.java.en.Given; //cette ligne rend l'annotation @Given disponible
+import io.cucumber.java.en.Given; 
 import org.testng.Assert; 
 
 

@@ -30,6 +30,10 @@
 
         <!--adding RestAssured version Properties 5.5.0-->
         <rest.assured.version>5.5.0</rest.assured.version>
+
+        <!-- ajout des rreconnaisnsae de tag
+            <cucumber.filter.tags></cucumber.filter.tags> -->
+
     </properties>
 
     <!--Dependencies: Cucumber, TestNG-->
@@ -103,6 +107,12 @@
                         <includes>
                         <include>**/TestRunner.java</include>
                         </includes>
+                        <!-- addition of cucumber SystemPropertyVariables
+                        <systemPropertyVariables>
+                        <cucumber.filter.tags>
+                                 ${cucumber.filter.tags}
+                        </cucumber.filter.tags>
+                        </systemPropertyVariables> -->
                     </configuration>
             </plugin>
             
