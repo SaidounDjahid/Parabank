@@ -223,11 +223,43 @@ public class ApiSteps{
     }
 
 
+    @Given("the selected customer account is funded through the API")
+public void selectedCustomerAccountIsFunded() {
 
+    int existingAccountId = context.sourceAccountId;
 
+    context.response = api.createAccount(
+            context.customerId,
+            0,
+            existingAccountId);
 
+    Assert.assertEquals(
+            context.response.statusCode(),
+            200);
 
+    context.sourceAccountId =
+            context.response.jsonPath().getInt("id");
 
+    context.response = api.deposit(
+            context.sourceAccountId,
+            Config.get("billpay.deposit"));
 
+    Assert.assertEquals(
+            context.response.statusCode(),
+            200);
+      
+
+            Assert.assertEquals(
+            context.response.statusCode(),
+            200,
+            "The deposit API should return HTTP 200.");
+              }
 }
+
+
+
+
+
+
+
 

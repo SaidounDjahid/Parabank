@@ -1,5 +1,7 @@
 package com.parabank.steps;
 
+import com.parabank.pages.BillPayPage;
+
 import com.parabank.config.Config;
 import com.parabank.context.TestContext;
 import com.parabank.pages.AccountOverviewPage;
@@ -20,6 +22,9 @@ public class UiSteps {
     private OpenNewAccountPage openNewAccountPage;
     private AccountOverviewPage accountOverviewPage;
 
+    private BillPayPage billPayPage;
+private String lastBillPaymentAmount;
+
     public UiSteps(TestContext context) { //Constructeur de UiSteps a besoin de context (pico container donne le meme context a ApiSteps, Hooks, et UiSteps )
         this.context = context;
     }
@@ -39,6 +44,8 @@ public class UiSteps {
         openNewAccountPage = new OpenNewAccountPage(context.driver);
 
         accountOverviewPage = new AccountOverviewPage(context.driver);
+
+        billPayPage = new BillPayPage(context.driver); 
 
         loginPage.open();
 
@@ -83,4 +90,78 @@ public class UiSteps {
                         context.newAccountId),
                 "The new account should appear in Account Overview.");
     }
+
+
+
+    @When("the customer pays a bill of {string} from the prepared account")
+    public void customerPaysBill(String amount) {
+
+    billPayPage.open();
+
+    lastBillPaymentAmount = amount;
+
+    billPayPage.payBill(
+            amount,
+            context.sourceAccountId);
+    }   
+    
+    
+    
+    
+    @Then("the bill payment is confirmed in the web portal")
+    public void billPaymentIsConfirmed() {
+
+    Assert.assertTrue(
+            billPayPage.isPaymentConfirmed(),
+            "The bill payment confirmation should be displayed.");
+
+    String confirmation =
+            billPayPage.getConfirmationText();
+
+    Assert.assertTrue(
+            confirmation.contains(lastBillPaymentAmount),
+            "The confirmation should display the payment amount.");
+
+    Assert.assertTrue(
+            confirmation.contains(
+                    String.valueOf(context.sourceAccountId)),
+            "The confirmation should display the source account.");
+    }
+
+    //formulaire vide
+    @When("the customer submits the bill payment form without mandatory information")
+    public void customerSubmitsEmptyBillPaymentForm() {
+
+    billPayPage.open();
+    billPayPage.submitEmptyForm();
+    }
+
+    //fields verification des champs obligatoires
+        @Then("required bill payment validation messages are displayed")
+        public void requiredValidationMessagesAreDisplayed() {
+
+        Assert.assertTrue(
+            billPayPage.hasAnyVisibleValidationError(),
+            "At least one mandatory field validation should be displayed.");
+        }
+
+    //montant = string par egg
+    @When("the customer submits a bill payment with an invalid amount")
+    public void customerSubmitsInvalidAmount() {
+
+    billPayPage.open();
+
+    billPayPage.submitInvalidAmount(
+            context.sourceAccountId);
+    }
+    //assertion du message d'errur Please enter a valid amount.
+    @Then("the invalid amount is rejected")
+    public void invalidAmountIsRejected() {
+
+    Assert.assertTrue(
+            billPayPage.hasVisibleError(
+                    "Please enter a valid amount."),
+            "The invalid amount validation should appear.");
+}
+
 }

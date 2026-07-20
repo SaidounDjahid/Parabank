@@ -38,7 +38,7 @@ public class Hooks {
     @After("@ui")
     public void closeBrowser() {
 
-    System.out.println("AFTER HOOK: fermeture du navigateur");
+    System.out.println("AFTER HOOK: Closing WebBrowser");
 
     if (context.driver != null) {
         context.driver.quit();

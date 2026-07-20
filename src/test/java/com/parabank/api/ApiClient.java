@@ -6,6 +6,8 @@ import io.restassured.response.Response;
 
 import static io.restassured.RestAssured.given;
 
+//ijnstrcuiton : 
+
 public class ApiClient { 
     // la méthode login recoit deux textes et retourne une réponse HTTP de type Response
     public Response login(String username, String password) {
@@ -48,6 +50,16 @@ public class ApiClient {
                 .queryParam("fromAccountId", sourceAccountId)
                 .post("/createAccount");
     }
+
+    public Response deposit(int accountId, String amount) {
+    return given()
+            .baseUri(Config.get("api.base.url"))
+            .accept(ContentType.JSON)
+            .queryParam("accountId", accountId)
+            .queryParam("amount", amount)
+            .when()
+            .post("/deposit");
+        }
 
     
 }
