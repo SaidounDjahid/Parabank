@@ -628,5 +628,5 @@ Possible future improvements include:
 - Better catch ui exceptions & handle them in specific way : not generic error css block
 - Move credentials and personal demo data to environment variables 
 - Run API and UI tests in separate CI jobs
-- Add a scheduled GitHub Actions execution for direct execution
+- Add a scheduled GitHub Actions execution for direct execution from repo
 ...
