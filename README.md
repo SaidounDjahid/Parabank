@@ -37,7 +37,7 @@ An internal error has occurred and has been logged.
 
 Or: 
 ```text
-The username & 
+The username and password could not be verified
 ```
 
 
