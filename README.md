@@ -1,11 +1,10 @@
-
 # ParaBank Test Automation
 
 This project is a test automation framework created for the ParaBank demo application.
 
 The main goal was to build a simple framework that combines API and UI testing while keeping the code easy to understand and maintain.
 
-The framework uses Java, Maven, Cucumber, TestNG, Selenium WebDriver and Rest Assured.
+The framework uses Java, Maven, Cucumber, TestNG, Selenium WebDriver, Rest Assured and PicoContainer.
 
 ![ParaBank home page](docs/images/parabank-homepage.png)
 
@@ -15,23 +14,56 @@ Application under test:
 https://parabank.parasoft.com/parabank/
 ```
 
-## Swagger Page
-The swagger page of the web application is stored in:
+## Swagger page
+
+The ParaBank REST API documentation is available here:
+
+```text
 https://parabank.parasoft.com/parabank/api-docs/index.html
+```
 
+---
 
+## Known limitation and login recovery
 
-## Known limitation
+The UI tests depend on the public ParaBank demo environment.
 
-The UI tests rely on the public ParaBank demo environment.
+During development, the normal customer login sometimes returned this server-side message:
 
-During the development, the application sometimes returned an internal server error during customer login. When this happens, the customer dashboard cannot be loaded and the UI scenarios cannot access authenticated features such as **Open New Account** or **Bill Pay**.
+```text
+An internal error has occurred and has been logged.
+```
 
-This issue comes from the public test environment and not necessarily from the automation framework. The same login error can also be reproduced manually in the browser.
-
-The complete test suite was successfully executed locally, in headless mode and through GitHub Actions when the ParaBank environment if fully available.
+When this happens, the customer dashboard is not loaded and authenticated functions such as **Open New Account** and **Bill Pay** are unavailable.
 
 ![ParaBank UI instability](docs/images/ui-instability.png)
+
+To make the UI scenarios more resilient, the framework keeps the normal username/password login as the primary path and uses ParaBank's official **Customer Lookup** page only when this exact internal error is detected.
+
+The recovery flow is:
+
+```text
+Normal UI login
+→ Login succeeds: continue the scenario
+→ Internal ParaBank error: open "Forgot login info?"
+→ Fill Customer Lookup with the demo customer information
+→ ParaBank validates the customer and opens an authenticated session
+→ Continue the original scenario
+```
+
+![Customer Lookup page](docs/images/customer-lookup.png)
+
+The fallback is not used for invalid credentials or any other unexpected login failure. In those situations, the scenario fails normally.
+
+This recovery mechanism is useful because it:
+
+- keeps the main login flow as the default;
+- handles a known intermittent problem in the public environment;
+- does not hard-code or reuse cookies such as the `JSESSIONID`;
+- uses a real ParaBank user journey;
+- keeps the recovery details inside Page Objects instead of the feature files.
+
+The Customer Lookup page displays the recovered password because ParaBank is a demonstration application.
 
 ---
 
@@ -51,7 +83,7 @@ The project currently contains 9 automated test scenarios.
 - Open a new savings account
 - Pay a bill with valid data
 - Reject a bill payment with missing mandatory information
-- Reject a bill payment with an invalid amount (amount=abc)
+- Reject a bill payment with an invalid amount such as `abc`
 
 ### Framework startup scenario
 
@@ -66,7 +98,7 @@ The project currently contains 9 automated test scenarios.
 
 The UI tests use a hybrid approach.
 
-The API prepares the test data (to reach certain back-end stade) before Selenium starting the browser.
+The API prepares the required back-end state before Selenium starts the browser.
 
 Example flow:
 
@@ -75,16 +107,12 @@ API login
 → API gets the customer ID
 → API gets or creates a source account
 → API deposits money when required
-→ Selenium logs in
+→ Selenium authenticates the customer
 → Selenium performs the UI action
 → Cucumber verifies the result
 ```
 
-This approach avoids preparing all test data through long & fragile UI forms.
-
-It also makes the scenarios faster to execute and more stable.
-
-
+This approach avoids preparing all test data through long and fragile UI forms. It also makes the scenarios faster and more stable.
 
 ---
 
@@ -109,7 +137,7 @@ The following setup was used on Windows 11.
 
 Download and install a Java 17 JDK.
 
-After the installation, open PowerShell and run:
+After installation, open PowerShell and run:
 
 ```powershell
 java -version
@@ -160,7 +188,7 @@ java -version
 ```
 
 ![JAVA_HOME environment variable](docs/images/java-home.png)
-![Windows path environment variable](docs/images/windows-path.png)
+![Windows Path environment variable](docs/images/windows-path.png)
 
 ---
 
@@ -219,7 +247,7 @@ The UI tests use Google Chrome.
 
 Make sure Chrome is installed and updated.
 
-Selenium Manager automatically finds and manages the required ChromeDriver =>  so no manual ChromeDriver setup is required for this project.
+Selenium Manager automatically finds and manages the required ChromeDriver, so no manual ChromeDriver setup is required.
 
 ![Google Chrome version](docs/images/chrome-version.png)
 
@@ -227,7 +255,7 @@ Selenium Manager automatically finds and manages the required ChromeDriver =>  s
 
 ## 5. Clone the repository
 
-Open PowerShell and run git clone command to clone project + ChangeDirectory command to navigate inside project:
+Open PowerShell and run:
 
 ```powershell
 git clone https://github.com/SaidounDjahid/Parabank.git
@@ -241,7 +269,7 @@ git status
 ```
 
 ![Repository cloned locally](docs/images/git-clone.png)
-![Git Status](docs/images/git-status.png)
+![Git status](docs/images/git-status.png)
 
 ---
 
@@ -249,17 +277,15 @@ git status
 
 The project can be opened with Visual Studio Code or IntelliJ IDEA.
 
-For Visual Studio Code:
-
 ![Project opened in VS Code](docs/images/vscode-project.png)
 
-(Optional) Recommended VS Code extensions:
+Optional VS Code extensions:
 
 - Extension Pack for Java
 - Cucumber
 - GitHub Actions
 
-![Used Extensions](docs/images/vscode-extensions.png)
+![Used extensions](docs/images/vscode-extensions.png)
 
 ---
 
@@ -280,12 +306,22 @@ api.base.url=https://parabank.parasoft.com/parabank/services/bank
 username=john
 password=demo
 
-wait.seconds=20
+customer.first.name=John
+customer.last.name=Smith
+customer.street=1431 Main St
+customer.city=Beverly Hills
+customer.state=CA
+customer.zip.code=90210
+customer.ssn=622-11-9999
+
+wait.seconds=30
 headless=false
 demo.delay.ms=0
 
 billpay.deposit=500.00
 ```
+
+The customer fields are used only by the Customer Lookup recovery flow when the normal UI login returns the known internal server error.
 
 The same file also contains the test payee information used by the Bill Pay scenarios.
 
@@ -299,6 +335,7 @@ The same file also contains the test payee information used by the Bill Pay scen
 | `api.base.url` | ParaBank REST API URL |
 | `username` | Demo customer username |
 | `password` | Demo customer password |
+| `customer.*` | Demo customer identity used by Customer Lookup |
 | `wait.seconds` | Maximum Selenium wait time |
 | `headless` | Runs Chrome without showing the browser |
 | `demo.delay.ms` | Optional delay after browser actions |
@@ -318,11 +355,11 @@ mvn clean test '-Dheadless=true'
 
 ## Compile the project
 
-
 ```powershell
 mvn clean test-compile
 ```
-![Build Compilation](docs/images/build-result.png)
+
+![Build compilation](docs/images/build-result.png)
 
 ## Run all tests
 
@@ -359,22 +396,21 @@ mvn clean test '-Dcucumber.filter.tags=@ui'
 
 ![UI tests execution](docs/images/ui-tests.png)
 
-
 ---
 
-## Run in headless mode = False (Show the broswser during test execution)
-
+## Run with a visible browser
 
 ```powershell
-mvn clean test '-Dheadless=false' 
+mvn clean test '-Dheadless=false'
 ```
-![headless = false](docs/images/headless.png)
+
+![Headless set to false](docs/images/headless.png)
 
 Chrome is controlled by Selenium:
 
-![headless true](docs/images/browser.png)
+![Browser controlled by Selenium](docs/images/browser.png)
 
-Headless mode is useful for CI execution because Chrome runs without opening a visible browser window, and also because the host execution machine does not have/need a graphical interface.
+For CI execution, headless mode is used because the execution machine does not require a graphical interface.
 
 ---
 
@@ -411,7 +447,7 @@ Examples:
 
 Connects the API Gherkin steps to `ApiClient`.
 
-It also saves API results inside `TestContext`.
+It also saves dynamic API results inside `TestContext`.
 
 ## `TestContext`
 
@@ -440,23 +476,47 @@ Contains reusable Selenium actions such as:
 - read text
 - select an option
 - wait for an element
+- check whether an element exists
+- wait for one of several possible page outcomes
 
-Will be used on all page objects page
+These helper methods are reused by all Page Objects.
 
 ## Page Objects
 
 Each Page Object represents one part of the ParaBank website.
 
-- `LoginPage` handles login
+- `LoginPage` handles the normal username/password login and detects login outcomes
+- `CustomerLookupPage` handles the official recovery form used after the known internal login error
 - `OpenNewAccountPage` handles account creation
 - `AccountOverviewPage` verifies that an account is displayed
 - `BillPayPage` handles bill payment and validation messages
+
+### Why `CustomerLookupPage` is separate
+
+Customer Lookup is a different page with its own URL, fields, button and result.
+
+Keeping it in a separate Page Object:
+
+- follows the Page Object Model;
+- avoids mixing two different screens inside `LoginPage`;
+- keeps locators close to the page that owns them;
+- makes the recovery flow easier to maintain and explain.
 
 ## `UiSteps`
 
 Connects the UI Gherkin steps to the Page Objects.
 
-It coordinates the browser actions but does not contain page locators.
+It coordinates the normal login and the conditional Customer Lookup recovery, but it does not contain page locators.
+
+The existing Gherkin step remains:
+
+```gherkin
+And the customer is logged in to the web portal
+```
+
+No extra feature step is required because Customer Lookup is an implementation detail used to achieve the same business result: an authenticated customer session.
+
+A separate Gherkin scenario would only be useful if the Customer Lookup feature itself needed to be tested as an independent business requirement.
 
 ## `TestRunner`
 
@@ -470,18 +530,17 @@ Starts the Cucumber scenarios with TestNG and generates the HTML report.
 
 The API prepares the customer and selects an existing account.
 
-Selenium then logs in and creates a new savings account.
+Selenium then authenticates the customer and creates a new savings account.
 
 ![Open new account page](docs/images/open-new-account-page.png)
 
-The test  verifies that the new account creation is sucessfll
+The test verifies that the account creation is successful:
 
-![New account displayed](docs/images/new-account-result.png).
+![New account displayed](docs/images/new-account-result.png)
 
-& check the new account is displayed in account overview
+It also checks that the new account is displayed in Accounts Overview:
 
-![New account displayed](docs/images/new-account-overview.png).
-
+![New account displayed in overview](docs/images/new-account-overview.png)
 
 ---
 
@@ -489,15 +548,15 @@ The test  verifies that the new account creation is sucessfll
 
 The API prepares a funded source account.
 
-Selenium opens the Bill Pay page and submits a payment.
+Selenium authenticates the customer, opens the Bill Pay page and submits a payment.
 
 ![Bill Pay form](docs/images/billpay-form.png)
 
 The framework also checks:
 
-- successful payment
-- missing mandatory fields
-- invalid amount
+- successful payment;
+- missing mandatory fields;
+- invalid amount.
 
 ![Bill Pay validation](docs/images/billpay-validation.png)
 
@@ -505,35 +564,33 @@ The framework also checks:
 
 # GitHub Actions
 
-The project contains a simple GitHub Actions workflow:
+The project contains a GitHub Actions workflow:
 
 ```text
 .github/workflows/tests.yml
 ```
 
-It runs automatically after each push or pul request.
+It runs automatically after each push or pull request.
 
 The workflow:
 
 1. downloads the repository;
 2. installs Java 17;
-3. runs all tests in headless mode.
+3. runs the tests in headless mode.
 
-A successful execution is displayed with a green status in the GitHub Actions page:
+A successful execution is displayed with a green status:
 
 ![GitHub Actions successful run](docs/images/github-actions-success.png)
 
-
-
-When one or more tests fail, the workflow is marked as failed and the related job is displayed in red:
+When one or more tests fail, the workflow and the related job are displayed in red:
 
 ![GitHub Actions unsuccessful run](docs/images/github-actions-no-success.png)
 
-When GitHub Actions email notifications are enabled, the user who triggered the workflow receive an email containing the failed workflow status and a direct link to the execution details. 
+When GitHub Actions email notifications are enabled, the user who triggered the workflow may receive an email containing the failed workflow status and a direct link to the execution details.
 
-![Build Failure Email](docs/images/build-failure.png)
+![Build failure email](docs/images/build-failure.png)
 
-This confirms that the framework also works on a clean Ubuntu machine and not only on the local Windows environment.
+This confirms that the framework can run on a clean Ubuntu machine and not only on the local Windows environment.
 
 ---
 
@@ -541,16 +598,18 @@ This confirms that the framework also works on a clean Ubuntu machine and not on
 
 ParaBank is a public demonstration environment.
 
-The data can often change between executions and the service may sometimes respond slowly, or throw differents erros.
+The test data can change between executions, and the service may sometimes respond slowly or return temporary server-side errors.
 
-The objective was to demonstrate:
+The project demonstrates:
 
-- API testing
-- UI testing
-- shared scenario data model
-- Page Object Model
-- Cucumber reporting
-- continuous integration
+- API testing;
+- UI testing;
+- hybrid API/UI scenarios;
+- shared scenario data;
+- Page Object Model;
+- conditional recovery from a known public-environment issue;
+- Cucumber reporting;
+- continuous integration.
 
 ---
 
@@ -558,11 +617,10 @@ The objective was to demonstrate:
 
 Possible future improvements include:
 
-- Attach a screenshot to the Cucumber report when a UI scenario fails 
-- Upload the Cucumber report as a GitHub Actions artifact 
-- Add more negative scenarios
-- Move credentials to environment variables 
-- Add retries for temporary public environment failures (Because we saw the issues are intermittent)
-- Run API and UI tests in separate CI jobs (Main change)
-- add scheduler for test execution in github action... 
-
+- Attach a screenshot to the Cucumber report when a UI scenario fails
+- Add more negative scenarios with more assertions 
+- Better catch ui exceptions & handle them in specific way : not generic error css block
+- Move credentials and personal demo data to environment variables 
+- Run API and UI tests in separate CI jobs
+- Add a scheduled GitHub Actions execution for direct execution
+...
