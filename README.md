@@ -28,43 +28,49 @@ https://parabank.parasoft.com/parabank/api-docs/index.html
 
 The UI tests depend on the public ParaBank demo environment.
 
-During development, the normal customer login sometimes returned this server-side message:
+During development, the normal customer login sometimes returned one of the following server-side messages:
+
 ```text
 An internal error has occurred and has been logged.
 ```
-![ParaBank UI instability](docs/images/ui-instability.png)
-Or: 
+
+![ParaBank internal login error](docs/images/ui-instability.png)
+
 ```text
-The username and password could not be verified
+The username and password could not be verified.
 ```
-![ParaBank UI instability](docs/images/ui-instability2.png)
+
+![ParaBank login verification error](docs/images/ui-instability2.png)
+
 When this happens, the customer dashboard is not loaded and authenticated functions such as **Open New Account** and **Bill Pay** are unavailable.
 
+To make the UI scenarios more resilient, the framework keeps the normal username/password login as the primary path.
 
-To make the UI scenarios more resilient, the framework keep the normal username/password login as the primary path and uses ParaBank's  **Customer Lookup** page only when an internal error is detected (as failback or failsafz).
+In the hybrid UI scenarios, the API first validates the configured demo customer. If the normal UI login then displays an error, the framework uses ParaBank's official **Customer Lookup** page as a fallback.
 
 The recovery flow is:
 
 ```text
-Normal UI login
+API validates the demo customer
+→ Normal UI login
 → Login succeeds: continue the scenario
-→ Internal ParaBank error: open "Forgot login info?"
+→ Login error displayed: open "Forgot login info?"
 → Fill Customer Lookup with the demo customer information
-→ ParaBank validates the customer and opens an authenticated session
+→ ParaBank opens an authenticated customer session
 → Continue the original scenario
 ```
 
 ![Customer Lookup page](docs/images/customer-lookup.png)
 
-The fallback is not used for invalid credentials or any other unexpected login failure. In those situations, the scenario fails normally.
+The fallback is only reached after the API has successfully validated the configured customer. If the API validation fails, the scenario stops before the UI recovery flow.
 
 This recovery mechanism is useful because it:
 
-- keeps the main login flow as the default;
-- handles a known intermittent problem in the public environment;
-- does not hard-code or reuse cookies such as the `JSESSIONID`;
-- uses a real ParaBank user journey;
-- keeps the recovery details inside Page Objects instead of the feature files.
+- keeps the normal login flow as the default;
+- handles an intermittent issue in the public environment;
+- does not hard-code or reuse cookies such as `JSESSIONID`;
+- uses an official ParaBank user journey;
+- keeps recovery details inside Page Objects instead of feature files.
 
 The Customer Lookup page displays the recovered password because ParaBank is a demonstration application.
 
@@ -205,20 +211,22 @@ Example:
 C:\apache-maven-3.9.16
 ```
 
-Create a system/user variable:
+Create a system or user variable:
 
 ```text
 Variable name: MAVEN_HOME
 Variable value: C:\apache-maven-3.9.16
 ```
-![maven environment variable](docs/images/maven-home.png)
+
+![Maven environment variable](docs/images/maven-home.png)
+
 Add this value to the Windows `Path`:
 
 ```text
 %MAVEN_HOME%\bin
 ```
-![maven bin variable](docs/images/maven-binary.png)
 
+![Maven binary path](docs/images/maven-binary.png)
 
 Restart PowerShell and verify the installation:
 
@@ -321,12 +329,12 @@ customer.ssn=622-11-9999
 
 wait.seconds=30
 headless=false
-demo.delay.ms=0
 
 billpay.deposit=500.00
 ```
 
-The customer fields are used by the Customer Lookup recovery flow when the API has validated the demo customer but the normal UI login displays an error.
+The customer fields are used by the Customer Lookup recovery flow after the API has validated the demo customer and the normal UI login displays an error.
+
 The same file also contains the test payee information used by the Bill Pay scenarios.
 
 ![Configuration file](docs/images/config-properties.png)
@@ -342,7 +350,6 @@ The same file also contains the test payee information used by the Bill Pay scen
 | `customer.*` | Demo customer identity used by Customer Lookup |
 | `wait.seconds` | Maximum Selenium wait time |
 | `headless` | Runs Chrome without showing the browser |
-| `demo.delay.ms` | Optional delay after browser actions |
 | `billpay.deposit` | Amount deposited before the Bill Pay scenario |
 
 System properties passed in the Maven command have priority over this file.
@@ -375,6 +382,7 @@ Expected result:
 
 ```text
 9 Scenarios (9 passed)
+41 Steps (41 passed)
 BUILD SUCCESS
 ```
 
@@ -418,19 +426,82 @@ For CI execution, headless mode is used because the execution machine does not r
 
 ---
 
-## Run tests and open the Cucumber report
+# Reporting, Observability, and CI/CD
+
+## Test Reports
+
+Cucumber generates an HTML execution report after each test run.
+
+Run the complete test suite:
 
 ```powershell
-mvn clean test; Start-Process .\target\cucumber-report.html
+mvn clean test
 ```
 
-The report is generated here:
+The report is generated at:
 
 ```text
 target/cucumber-report.html
 ```
 
+On Windows, the tests can be executed and the report opened directly with:
+
+```powershell
+mvn clean test; Start-Process .\target\cucumber-report.html
+```
+
+The report contains:
+
+- executed features and scenarios;
+- passed and failed steps;
+- execution duration;
+- failure messages and stack traces.
+
 ![Cucumber HTML report](docs/images/cucumber-report.png)
+
+## Observability
+
+Test execution can be monitored through:
+
+- Maven output in the terminal;
+- Cucumber scenario and step results;
+- exception messages and stack traces;
+- GitHub Actions execution logs;
+- the generated Cucumber HTML report.
+
+When the normal ParaBank UI login displays an error and the Customer Lookup recovery is used, the fallback decision and the original login error are also written to the execution logs.
+
+## Continuous Integration
+
+The GitHub Actions workflow is stored in:
+
+```text
+.github/workflows/tests.yml
+```
+
+It runs automatically after each push or pull request.
+
+The workflow:
+
+1. checks out the repository;
+2. configures Java 17;
+3. runs the Maven test suite on an Ubuntu runner;
+4. executes the UI scenarios in headless mode;
+5. marks the workflow as successful or failed according to the Maven test result.
+
+A successful execution is displayed with a green status:
+
+![GitHub Actions successful run](docs/images/github-actions-success.png)
+
+When one or more tests fail, the workflow is marked as failed and the execution logs provide the related scenario, exception and stack trace:
+
+![GitHub Actions unsuccessful run](docs/images/github-actions-no-success.png)
+
+When GitHub Actions email notifications are enabled, the user who triggered the workflow may also receive an email containing the workflow status and a link to the execution details.
+
+![Build failure email](docs/images/build-failure.png)
+
+This validates that the framework can run on a clean Ubuntu environment and not only on the local Windows development machine.
 
 ---
 
@@ -566,38 +637,6 @@ The framework also checks:
 
 ---
 
-# GitHub Actions
-
-The project contains a GitHub Actions workflow:
-
-```text
-.github/workflows/tests.yml
-```
-
-It runs automatically after each push or pull request.
-
-The workflow:
-
-1. downloads the repository;
-2. installs Java 17;
-3. runs the tests in headless mode.
-
-A successful execution is displayed with a green status:
-
-![GitHub Actions successful run](docs/images/github-actions-success.png)
-
-When one or more tests fail, the workflow and the related job are displayed in red:
-
-![GitHub Actions unsuccessful run](docs/images/github-actions-no-success.png)
-
-When GitHub Actions email notifications are enabled, the user who triggered the workflow may receive an email containing the failed workflow status and a direct link to the execution details.
-
-![Build failure email](docs/images/build-failure.png)
-
-This confirms that the framework can run on a clean Ubuntu machine and not only on the local Windows environment.
-
----
-
 # Notes
 
 ParaBank is a public demonstration environment.
@@ -622,10 +661,9 @@ The project demonstrates:
 Possible future improvements include:
 
 - Attach a screenshot to the Cucumber report when a UI scenario fails
-- Add cross-browser capability for test execution
-- Add more negative scenarios with more assertions 
-- Better catch ui exceptions & handle them in specific way : not generic error css block
-- Move credentials and personal demo data to environment variables 
+- Add cross-browser execution
+- Add more negative scenarios and assertions
+- Handle UI failures with page-specific error states instead of relying on a generic CSS error locator
+- Move credentials and demo customer data to environment variables
 - Run API and UI tests in separate CI jobs
-- Add a scheduled GitHub Actions execution for direct execution from repo
-...
+- Add a scheduled GitHub Actions execution
