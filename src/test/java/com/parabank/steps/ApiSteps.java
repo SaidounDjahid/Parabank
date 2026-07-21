@@ -224,7 +224,7 @@ public class ApiSteps{
 
 
     @Given("the selected customer account is funded through the API")
-public void selectedCustomerAccountIsFunded() {
+    public void selectedCustomerAccountIsFunded() {
 
     int existingAccountId = context.sourceAccountId;
 
