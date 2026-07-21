@@ -41,7 +41,7 @@ The username and password could not be verified
 When this happens, the customer dashboard is not loaded and authenticated functions such as **Open New Account** and **Bill Pay** are unavailable.
 
 
-To make the UI scenarios more resilient, the framework keep the normal username/password login as the primary path and uses ParaBank's  **Customer Lookup** page only when an internal error is detected (as failback or failsafz)
+To make the UI scenarios more resilient, the framework keep the normal username/password login as the primary path and uses ParaBank's  **Customer Lookup** page only when an internal error is detected (as failback or failsafz).
 
 The recovery flow is:
 
@@ -205,18 +205,20 @@ Example:
 C:\apache-maven-3.9.16
 ```
 
-Create a system variable:
+Create a system/user variable:
 
 ```text
 Variable name: MAVEN_HOME
 Variable value: C:\apache-maven-3.9.16
 ```
-
+![maven environment variable](docs/images/maven-home.png)
 Add this value to the Windows `Path`:
 
 ```text
 %MAVEN_HOME%\bin
 ```
+![maven bin variable](docs/images/maven-binary.png)
+
 
 Restart PowerShell and verify the installation:
 
