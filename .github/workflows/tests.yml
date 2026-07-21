@@ -1,0 +1,17 @@
+name: Tests
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest #os of machine
+
+    steps:
+      - uses: actions/checkout@v6 #Load project on Github machine
+
+      - uses: actions/setup-java@v4 #Install java 17
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - run: mvn clean test -Dheadless=true -Ddemo.delay.ms=0 #execute our scenarios with headless=true
