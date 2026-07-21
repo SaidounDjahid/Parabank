@@ -33,10 +33,18 @@ During development, the normal customer login sometimes returned this server-sid
 ```text
 An internal error has occurred and has been logged.
 ```
+![ParaBank UI instability](docs/images/ui-instability.png)
+
+Or: 
+```text
+The username & 
+```
+
+
+![ParaBank UI instability](docs/images/ui-instability2.png)
 
 When this happens, the customer dashboard is not loaded and authenticated functions such as **Open New Account** and **Bill Pay** are unavailable.
 
-![ParaBank UI instability](docs/images/ui-instability.png)
 
 To make the UI scenarios more resilient, the framework keeps the normal username/password login as the primary path and uses ParaBank's official **Customer Lookup** page only when this exact internal error is detected.
 
