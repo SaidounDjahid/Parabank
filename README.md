@@ -29,24 +29,19 @@ https://parabank.parasoft.com/parabank/api-docs/index.html
 The UI tests depend on the public ParaBank demo environment.
 
 During development, the normal customer login sometimes returned this server-side message:
-
 ```text
 An internal error has occurred and has been logged.
 ```
 ![ParaBank UI instability](docs/images/ui-instability.png)
-
 Or: 
 ```text
 The username and password could not be verified
 ```
-
-
 ![ParaBank UI instability](docs/images/ui-instability2.png)
-
 When this happens, the customer dashboard is not loaded and authenticated functions such as **Open New Account** and **Bill Pay** are unavailable.
 
 
-To make the UI scenarios more resilient, the framework keeps the normal username/password login as the primary path and uses ParaBank's official **Customer Lookup** page only when an internal error is detected.
+To make the UI scenarios more resilient, the framework keep the normal username/password login as the primary path and uses ParaBank's  **Customer Lookup** page only when an internal error is detected (as failback or failsafz)
 
 The recovery flow is:
 
