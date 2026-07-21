@@ -623,6 +623,7 @@ The project demonstrates:
 Possible future improvements include:
 
 - Attach a screenshot to the Cucumber report when a UI scenario fails
+- Add cross-browser capability for test execution
 - Add more negative scenarios with more assertions 
 - Better catch ui exceptions & handle them in specific way : not generic error css block
 - Move credentials and personal demo data to environment variables 
