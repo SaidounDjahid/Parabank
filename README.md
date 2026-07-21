@@ -326,8 +326,7 @@ demo.delay.ms=0
 billpay.deposit=500.00
 ```
 
-The customer fields are used only by the Customer Lookup recovery flow when the normal UI login returns the known internal server error.
-
+The customer fields are used by the Customer Lookup recovery flow when the API has validated the demo customer but the normal UI login displays an error.
 The same file also contains the test payee information used by the Bill Pay scenarios.
 
 ![Configuration file](docs/images/config-properties.png)
@@ -491,7 +490,7 @@ These helper methods are reused by all Page Objects.
 Each Page Object represents one part of the ParaBank website.
 
 - `LoginPage` handles the normal username/password login and detects login outcomes
-- `CustomerLookupPage` handles the official recovery form used after the known internal login error
+- `CustomerLookupPage` handles the official recovery form used when the validated demo customer cannot log in through the normal UI flow
 - `OpenNewAccountPage` handles account creation
 - `AccountOverviewPage` verifies that an account is displayed
 - `BillPayPage` handles bill payment and validation messages
